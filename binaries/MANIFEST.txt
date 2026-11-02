@@ -1,0 +1,10 @@
+# Binary icon manifest
+# Format per line: <target path in the CoMaps/Waymark source tree> <base64 file in this repo> <sha256 of the PNG at HEAD d80d2b2> <bytes>
+# Each .b64 file is a single line of base64 (base64 -w0), because the
+# GitHub snapshot push cannot carry binary files. The workflow decodes
+# each file to its target path and checks the sha256 before building.
+android/app/src/main/res/mipmap-hdpi/ic_launcher.png binaries/mipmap-hdpi/ic_launcher.png.b64 373b8e6d5bb56c09008bbfb933182d9be0c28bf586f6370f368b3291d1f8c8af 3270
+android/app/src/main/res/mipmap-mdpi/ic_launcher.png binaries/mipmap-mdpi/ic_launcher.png.b64 3fc040adb8e89cd74d3aa4ee7d61e8bb150b3beb2990f714fd73f7bce030cc92 2150
+android/app/src/main/res/mipmap-xhdpi/ic_launcher.png binaries/mipmap-xhdpi/ic_launcher.png.b64 44f1171b9341e339530fadf71cd35bfb95a5fe629d0830afda9dae69607d6f32 4340
+android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png binaries/mipmap-xxhdpi/ic_launcher.png.b64 cf0ee7b542c6ad7790e8f79bab4a6e4ff4693a5dc72901ea25910aeca4076825 6412
+android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png binaries/mipmap-xxxhdpi/ic_launcher.png.b64 ad93de9ad2eaec9bf958b8eb05b7cfb03f7bb6a5569b2e2932f0ee1b874fff61 8797

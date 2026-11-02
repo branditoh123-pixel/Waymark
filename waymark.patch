@@ -1,0 +1,663 @@
+diff --git a/android/app/build.gradle.kts b/android/app/build.gradle.kts
+index fe01b90..7c80c28 100644
+--- a/android/app/build.gradle.kts
++++ b/android/app/build.gradle.kts
+@@ -38,8 +38,8 @@ java {
+     }
+ }
+ 
+-val appName = "CoMaps"
+-val appId = "app.comaps"
++val appName = "Waymark"
++val appId = "app.waymark"
+ // These are properly set in the 'secure.properties.*' files but must be declared here for build sync to succeed.
+ project.ext["secretTestStoreFile"] = "comaps-test.keystore"
+ project.ext["secretTestStorePassword"] = ""
+@@ -113,7 +113,7 @@ android {
+             applicationIdSuffix = ".google"
+             versionName = "${android.defaultConfig.versionName!!}-Google"
+             buildConfigField("String", "SUPPORT_MAIL", "\"gplay@comaps.app\"")
+-            buildConfigField("String", "REVIEW_URL", "\"market://details?id=app.comaps.google\"")
++            buildConfigField("String", "REVIEW_URL", "\"market://details?id=app.waymark.google\"")
+         }
+ 
+         // Distributed directly by the project, e.g. in repo releases, chats, etc.
+@@ -137,7 +137,7 @@ android {
+             versionName = "${android.defaultConfig.versionName!!}-Huawei"
+             versionCode = huaweiVersionCodeBase + android.defaultConfig.versionCode!!
+             buildConfigField("String", "SUPPORT_MAIL", "\"huawei@comaps.app\"")
+-            buildConfigField("String", "REVIEW_URL", "\"appmarket://details?id=app.comaps\"")
++            buildConfigField("String", "REVIEW_URL", "\"appmarket://details?id=app.waymark\"")
+         }
+     }
+ 
+@@ -200,7 +200,7 @@ android {
+         getByName("debug") {
+             storeFile = project.projectDir.resolve(File(comapsDebugKeystorePath))
+             storePassword = "12345678"
+-            keyAlias = "$appName Debug"
++            keyAlias = "CoMaps Debug" // Waymark: pinned; bundled comaps-debug.keystore alias is unverified, see FORK_NOTES.md
+             keyPassword = "12345678"
+         }
+         create("test") {
+diff --git a/android/app/src/main/java/app/organicmaps/widget/placepage/sections/PlacePageWikipediaFragment.java b/android/app/src/main/java/app/organicmaps/widget/placepage/sections/PlacePageWikipediaFragment.java
+index a562dad..5e49a9b 100644
+--- a/android/app/src/main/java/app/organicmaps/widget/placepage/sections/PlacePageWikipediaFragment.java
++++ b/android/app/src/main/java/app/organicmaps/widget/placepage/sections/PlacePageWikipediaFragment.java
+@@ -87,8 +87,8 @@ public class PlacePageWikipediaFragment extends Fragment implements Observer<Map
+ 
+   private void updateViews()
+   {
+-    // There are two sources of wiki info in CoMaps:
+-    // wiki links from OpenStreetMap, and wiki pages explicitly parsed into CoMaps.
++    // There are two sources of wiki info in Waymark:
++    // wiki links from OpenStreetMap, and wiki pages explicitly parsed into Waymark.
+     // This part hides the WikiArticleView if the wiki page has not been parsed.
+     if (TextUtils.isEmpty(mMapObject.getWikiArticle()))
+       UiUtils.hide(mWikiArticleViewContainer);
+diff --git a/android/app/src/main/res/drawable/ic_launcher_foreground.xml b/android/app/src/main/res/drawable/ic_launcher_foreground.xml
+index 3d5c0bf..9d29f7c 100644
+--- a/android/app/src/main/res/drawable/ic_launcher_foreground.xml
++++ b/android/app/src/main/res/drawable/ic_launcher_foreground.xml
+@@ -1,16 +1,18 @@
+-<vector
+-  xmlns:android="http://schemas.android.com/apk/res/android"
+-  android:width="64dp"
+-  android:height="64dp"
+-  android:viewportWidth="64"
+-  android:viewportHeight="64">
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
+   <path
+-    android:pathData="m43.279,20.906a0.803,0.803 0,0 1,1.236 -0.052,16.697 16.697,0 0,1 4.243,11.142 16.697,16.697 0,0 1,-3.745 10.556,0.803 0.803,0 0,1 -1.256,-0.024l-1.726,-2.272a0.803,0.803 0,0 1,-0.008 -0.963,12.322 12.322,0 0,0 2.38,-7.297c0,-2.978 -1.052,-5.712 -2.806,-7.851a0.803,0.803 0,0 1,-0.02 -0.995z"
+-    android:fillColor="@color/fg_app_icon_release"/>
++      android:pathData="M34,104 L48,60 L60,60 L74,104 Z"
++      android:fillColor="#FFFFFF"/>
+   <path
+-    android:pathData="m25.706,33.561a0.803,0.803 0,0 1,-0.309 -1.473l11.319,-7.12a0.803,0.803 0,0 1,1.2 0.911l-3.893,12.8a0.803,0.803 0,0 1,-1.505 0.088l-1.975,-4.475z"
+-    android:fillColor="@color/fg_app_icon_release"/>
++      android:pathData="M52,96 L56,96 L57,88 L51,88 Z M51.5,84 L56.5,84 L57,76 L51,76 Z M52,72 L56,72 L56.5,66 L51.5,66 Z"
++      android:fillColor="#16263F"/>
+   <path
+-    android:pathData="m40.381,45.466a0.803,0.803 0,0 1,-0.249 1.188,16.697 16.697,0 0,1 -8.132,2.103 16.765,16.765 0,0 1,-16.757 -16.761,16.765 16.765,0 0,1 24.215,-15.007 0.803,0.803 0,0 1,0.281 1.204l-1.702,2.24a0.803,0.803 0,0 1,-0.971 0.245,12.322 12.322,0 0,0 -5.065,-1.084 12.402,12.402 0,0 0,-12.402 12.402c0,6.847 5.559,12.402 12.402,12.402a12.322,12.322 0,0 0,5.683 -1.377,0.803 0.803,0 0,1 1.007,0.225z"
+-    android:fillColor="@color/fg_app_icon_white"/>
++      android:pathData="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z"
++      android:fillColor="#F8B42E"/>
++  <path
++      android:pathData="M44,39 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
++      android:fillColor="#16263F"/>
+ </vector>
+diff --git a/android/app/src/main/res/drawable/ic_launcher_foreground_debug.xml b/android/app/src/main/res/drawable/ic_launcher_foreground_debug.xml
+index b34750a..9b73537 100644
+--- a/android/app/src/main/res/drawable/ic_launcher_foreground_debug.xml
++++ b/android/app/src/main/res/drawable/ic_launcher_foreground_debug.xml
+@@ -1,22 +1,18 @@
+-<vector
+-  xmlns:android="http://schemas.android.com/apk/res/android"
+-  android:width="64dp"
+-  android:height="64dp"
+-  android:viewportWidth="64"
+-  android:viewportHeight="64">
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
+   <path
+-    android:pathData="m43.279,20.906a0.803,0.803 0,0 1,1.236 -0.052,16.697 16.697,0 0,1 4.243,11.142 16.697,16.697 0,0 1,-3.745 10.556,0.803 0.803,0 0,1 -1.256,-0.024l-1.726,-2.272a0.803,0.803 0,0 1,-0.008 -0.963,12.322 12.322,0 0,0 2.38,-7.297c0,-2.978 -1.052,-5.712 -2.806,-7.851a0.803,0.803 0,0 1,-0.02 -0.995z"
+-    android:fillColor="@color/fg_app_icon_debug_fill1"
+-    android:strokeWidth="@dimen/app_icon_border_width"
+-    android:strokeColor="@color/fg_app_icon_debug_border"/>
++      android:pathData="M34,104 L48,60 L60,60 L74,104 Z"
++      android:fillColor="#FFFFFF"/>
+   <path
+-    android:pathData="m25.706,33.561a0.803,0.803 0,0 1,-0.309 -1.473l11.319,-7.12a0.803,0.803 0,0 1,1.2 0.911l-3.893,12.8a0.803,0.803 0,0 1,-1.505 0.088l-1.975,-4.475z"
+-    android:fillColor="@color/fg_app_icon_debug_fill1"
+-    android:strokeWidth="@dimen/app_icon_border_width"
+-    android:strokeColor="@color/fg_app_icon_debug_border"/>
++      android:pathData="M52,96 L56,96 L57,88 L51,88 Z M51.5,84 L56.5,84 L57,76 L51,76 Z M52,72 L56,72 L56.5,66 L51.5,66 Z"
++      android:fillColor="#16263F"/>
+   <path
+-    android:pathData="m40.381,45.466a0.803,0.803 0,0 1,-0.249 1.188,16.697 16.697,0 0,1 -8.132,2.103 16.765,16.765 0,0 1,-16.757 -16.761,16.765 16.765,0 0,1 24.215,-15.007 0.803,0.803 0,0 1,0.281 1.204l-1.702,2.24a0.803,0.803 0,0 1,-0.971 0.245,12.322 12.322,0 0,0 -5.065,-1.084 12.402,12.402 0,0 0,-12.402 12.402c0,6.847 5.559,12.402 12.402,12.402a12.322,12.322 0,0 0,5.683 -1.377,0.803 0.803,0 0,1 1.007,0.225z"
+-    android:fillColor="@color/fg_app_icon_debug_fill2"
+-    android:strokeWidth="@dimen/app_icon_border_width"
+-    android:strokeColor="@color/fg_app_icon_white"/>
++      android:pathData="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z"
++      android:fillColor="@color/fg_app_icon_debug_fill1"/>
++  <path
++      android:pathData="M44,39 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
++      android:fillColor="#16263F"/>
+ </vector>
+diff --git a/android/app/src/main/res/drawable/ic_launcher_foreground_monochrome.xml b/android/app/src/main/res/drawable/ic_launcher_foreground_monochrome.xml
+index 956ad61..a7ea461 100644
+--- a/android/app/src/main/res/drawable/ic_launcher_foreground_monochrome.xml
++++ b/android/app/src/main/res/drawable/ic_launcher_foreground_monochrome.xml
+@@ -1,15 +1,18 @@
+ <vector xmlns:android="http://schemas.android.com/apk/res/android"
+-  android:width="64dp"
+-  android:height="64dp"
+-  android:viewportWidth="64"
+-  android:viewportHeight="64">
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
+   <path
+-    android:pathData="m43.279,20.906a0.803,0.803 0,0 1,1.236 -0.052,16.697 16.697,0 0,1 4.243,11.142 16.697,16.697 0,0 1,-3.745 10.556,0.803 0.803,0 0,1 -1.256,-0.024l-1.726,-2.272a0.803,0.803 0,0 1,-0.008 -0.963,12.322 12.322,0 0,0 2.38,-7.297c0,-2.978 -1.052,-5.712 -2.806,-7.851a0.803,0.803 0,0 1,-0.02 -0.995z"
+-    android:fillColor="#BFFFFFFF"/>
++      android:pathData="M34,104 L48,60 L60,60 L74,104 Z"
++      android:fillColor="#FFFFFF"/>
+   <path
+-    android:pathData="m25.706,33.561a0.803,0.803 0,0 1,-0.309 -1.473l11.319,-7.12a0.803,0.803 0,0 1,1.2 0.911l-3.893,12.8a0.803,0.803 0,0 1,-1.505 0.088l-1.975,-4.475z"
+-    android:fillColor="#BFFFFFFF"/>
++      android:pathData="M52,96 L56,96 L57,88 L51,88 Z M51.5,84 L56.5,84 L57,76 L51,76 Z M52,72 L56,72 L56.5,66 L51.5,66 Z"
++      android:fillColor="#FFFFFF"/>
+   <path
+-    android:pathData="m40.381,45.466a0.803,0.803 0,0 1,-0.249 1.188,16.697 16.697,0 0,1 -8.132,2.103 16.765,16.765 0,0 1,-16.757 -16.761,16.765 16.765,0 0,1 24.215,-15.007 0.803,0.803 0,0 1,0.281 1.204l-1.702,2.24a0.803,0.803 0,0 1,-0.971 0.245,12.322 12.322,0 0,0 -5.065,-1.084 12.402,12.402 0,0 0,-12.402 12.402c0,6.847 5.559,12.402 12.402,12.402a12.322,12.322 0,0 0,5.683 -1.377,0.803 0.803,0 0,1 1.007,0.225z"
+-    android:fillColor="#FFFFFF"/>
++      android:pathData="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z"
++      android:fillColor="#FFFFFF"/>
++  <path
++      android:pathData="M44,39 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
++      android:fillColor="#FFFFFF"/>
+ </vector>
+diff --git a/android/app/src/main/res/drawable/ic_launcher_foreground_test.xml b/android/app/src/main/res/drawable/ic_launcher_foreground_test.xml
+index d00eebf..74bec8a 100644
+--- a/android/app/src/main/res/drawable/ic_launcher_foreground_test.xml
++++ b/android/app/src/main/res/drawable/ic_launcher_foreground_test.xml
+@@ -1,21 +1,18 @@
+ <vector xmlns:android="http://schemas.android.com/apk/res/android"
+-  android:width="64dp"
+-  android:height="64dp"
+-  android:viewportWidth="64"
+-  android:viewportHeight="64">
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
+   <path
+-    android:pathData="m43.279,20.906a0.803,0.803 0,0 1,1.236 -0.052,16.697 16.697,0 0,1 4.243,11.142 16.697,16.697 0,0 1,-3.745 10.556,0.803 0.803,0 0,1 -1.256,-0.024l-1.726,-2.272a0.803,0.803 0,0 1,-0.008 -0.963,12.322 12.322,0 0,0 2.38,-7.297c0,-2.978 -1.052,-5.712 -2.806,-7.851a0.803,0.803 0,0 1,-0.02 -0.995z"
+-    android:fillColor="@color/fg_app_icon_test_fill1"
+-    android:strokeWidth="@dimen/app_icon_border_width"
+-    android:strokeColor="@color/fg_app_icon_release"/>
++      android:pathData="M34,104 L48,60 L60,60 L74,104 Z"
++      android:fillColor="#FFFFFF"/>
+   <path
+-    android:pathData="m25.706,33.561a0.803,0.803 0,0 1,-0.309 -1.473l11.319,-7.12a0.803,0.803 0,0 1,1.2 0.911l-3.893,12.8a0.803,0.803 0,0 1,-1.505 0.088l-1.975,-4.475z"
+-    android:fillColor="@color/fg_app_icon_test_fill1"
+-    android:strokeWidth="@dimen/app_icon_border_width"
+-    android:strokeColor="@color/fg_app_icon_release"/>
++      android:pathData="M52,96 L56,96 L57,88 L51,88 Z M51.5,84 L56.5,84 L57,76 L51,76 Z M52,72 L56,72 L56.5,66 L51.5,66 Z"
++      android:fillColor="#16263F"/>
+   <path
+-    android:pathData="m40.381,45.466a0.803,0.803 0,0 1,-0.249 1.188,16.697 16.697,0 0,1 -8.132,2.103 16.765,16.765 0,0 1,-16.757 -16.761,16.765 16.765,0 0,1 24.215,-15.007 0.803,0.803 0,0 1,0.281 1.204l-1.702,2.24a0.803,0.803 0,0 1,-0.971 0.245,12.322 12.322,0 0,0 -5.065,-1.084 12.402,12.402 0,0 0,-12.402 12.402c0,6.847 5.559,12.402 12.402,12.402a12.322,12.322 0,0 0,5.683 -1.377,0.803 0.803,0 0,1 1.007,0.225z"
+-    android:fillColor="@color/fg_app_icon_test_fill2"
+-    android:strokeWidth="@dimen/app_icon_border_width"
+-    android:strokeColor="@color/fg_app_icon_white"/>
++      android:pathData="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z"
++      android:fillColor="@color/fg_app_icon_test_fill1"/>
++  <path
++      android:pathData="M44,39 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
++      android:fillColor="#16263F"/>
+ </vector>
+diff --git a/android/app/src/main/res/drawable/ic_logo.xml b/android/app/src/main/res/drawable/ic_logo.xml
+index 0a5f45e..65d4621 100644
+--- a/android/app/src/main/res/drawable/ic_logo.xml
++++ b/android/app/src/main/res/drawable/ic_logo.xml
+@@ -1,12 +1,18 @@
+ <vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="64dp"
+-    android:height="64dp"
+-    android:viewportWidth="835"
+-    android:viewportHeight="835">
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
+   <path
+-      android:pathData="M698.5,141.1a20,20 0,0 1,30.8 -1.3A416,416 0,0 1,835 417.4a416,416 0,0 1,-93.3 263,20 20,0 0,1 -31.3,-0.6l-43,-56.6a20,20 0,0 1,-0.2 -24,307 307,0 0,0 59.3,-181.8c0,-74.2 -26.2,-142.3 -69.9,-195.6a20,20 0,0 1,-0.5 -24.8zM260.7,456.4a20,20 0,0 1,-7.7 -36.7l282,-177.4a20,20 0,0 1,29.9 22.7l-97,318.9a20,20 0,0 1,-37.5 2.2l-49.2,-111.5z"
+-      android:fillColor="#ccdfca"/>
++      android:pathData="M34,104 L48,60 L60,60 L74,104 Z"
++      android:fillColor="#F8B42E"/>
+   <path
+-      android:pathData="M626.3,753a20,20 0,0 1,-6.2 29.6A416,416 0,0 1,417.5 835,417.7 417.7,0 0,1 0,417.4 417.7,417.7 0,0 1,603.3 43.5a20,20 0,0 1,7 30l-42.4,55.8a20,20 0,0 1,-24.2 6.1,307 307,0 0,0 -126.2,-27 309,309 0,0 0,-309 309c0,170.6 138.5,309 309,309a307,307 0,0 0,141.6 -34.3,20 20,0 0,1 25.1,5.6z"
+-      android:fillColor="#fefdf6"/>
++      android:pathData="M52,96 L56,96 L57,88 L51,88 Z M51.5,84 L56.5,84 L57,76 L51,76 Z M52,72 L56,72 L56.5,66 L51.5,66 Z"
++      android:fillColor="#16263F"/>
++  <path
++      android:pathData="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z"
++      android:fillColor="#16263F"/>
++  <path
++      android:pathData="M44,39 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
++      android:fillColor="#F8B42E"/>
+ </vector>
+diff --git a/android/app/src/main/res/drawable/ic_logo_monochrome.xml b/android/app/src/main/res/drawable/ic_logo_monochrome.xml
+index a843e26..a7ea461 100644
+--- a/android/app/src/main/res/drawable/ic_logo_monochrome.xml
++++ b/android/app/src/main/res/drawable/ic_logo_monochrome.xml
+@@ -1,12 +1,18 @@
+ <vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="64dp"
+-    android:height="64dp"
+-    android:viewportWidth="835"
+-    android:viewportHeight="835">
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
+   <path
+-      android:pathData="M698.5,141.1a20,20 0,0 1,30.8 -1.3A416,416 0,0 1,835 417.4a416,416 0,0 1,-93.3 263,20 20,0 0,1 -31.3,-0.6l-43,-56.6a20,20 0,0 1,-0.2 -24,307 307,0 0,0 59.3,-181.8c0,-74.2 -26.2,-142.3 -69.9,-195.6a20,20 0,0 1,-0.5 -24.8zM260.7,456.4a20,20 0,0 1,-7.7 -36.7l282,-177.4a20,20 0,0 1,29.9 22.7l-97,318.9a20,20 0,0 1,-37.5 2.2l-49.2,-111.5z"
+-      android:fillColor="#BFFFFFFF"/>
++      android:pathData="M34,104 L48,60 L60,60 L74,104 Z"
++      android:fillColor="#FFFFFF"/>
+   <path
+-      android:pathData="M626.3,753a20,20 0,0 1,-6.2 29.6A416,416 0,0 1,417.5 835,417.7 417.7,0 0,1 0,417.4 417.7,417.7 0,0 1,603.3 43.5a20,20 0,0 1,7 30l-42.4,55.8a20,20 0,0 1,-24.2 6.1,307 307,0 0,0 -126.2,-27 309,309 0,0 0,-309 309c0,170.6 138.5,309 309,309a307,307 0,0 0,141.6 -34.3,20 20,0 0,1 25.1,5.6z"
+-      android:fillColor="#FFFFFFFF"/>
++      android:pathData="M52,96 L56,96 L57,88 L51,88 Z M51.5,84 L56.5,84 L57,76 L51,76 Z M52,72 L56,72 L56.5,66 L51.5,66 Z"
++      android:fillColor="#FFFFFF"/>
++  <path
++      android:pathData="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z"
++      android:fillColor="#FFFFFF"/>
++  <path
++      android:pathData="M44,39 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
++      android:fillColor="#FFFFFF"/>
+ </vector>
+diff --git a/android/app/src/main/res/drawable/ic_logo_monochrome_settings.xml b/android/app/src/main/res/drawable/ic_logo_monochrome_settings.xml
+index 0739dbd..a7ea461 100644
+--- a/android/app/src/main/res/drawable/ic_logo_monochrome_settings.xml
++++ b/android/app/src/main/res/drawable/ic_logo_monochrome_settings.xml
+@@ -1,13 +1,18 @@
+ <vector xmlns:android="http://schemas.android.com/apk/res/android"
+-  android:width="22dp"
+-  android:height="22dp"
+-  android:tint="?iconTint"
+-  android:viewportWidth="835"
+-  android:viewportHeight="835">
+-  <path
+-    android:pathData="M698.5,141.1a20,20 0,0 1,30.8 -1.3A416,416 0,0 1,835 417.4a416,416 0,0 1,-93.3 263,20 20,0 0,1 -31.3,-0.6l-43,-56.6a20,20 0,0 1,-0.2 -24,307 307,0 0,0 59.3,-181.8c0,-74.2 -26.2,-142.3 -69.9,-195.6a20,20 0,0 1,-0.5 -24.8zM260.7,456.4a20,20 0,0 1,-7.7 -36.7l282,-177.4a20,20 0,0 1,29.9 22.7l-97,318.9a20,20 0,0 1,-37.5 2.2l-49.2,-111.5z"
+-    android:fillColor="#BFFFFFFF"/>
+-  <path
+-    android:pathData="M626.3,753a20,20 0,0 1,-6.2 29.6A416,416 0,0 1,417.5 835,417.7 417.7,0 0,1 0,417.4 417.7,417.7 0,0 1,603.3 43.5a20,20 0,0 1,7 30l-42.4,55.8a20,20 0,0 1,-24.2 6.1,307 307,0 0,0 -126.2,-27 309,309 0,0 0,-309 309c0,170.6 138.5,309 309,309a307,307 0,0 0,141.6 -34.3,20 20,0 0,1 25.1,5.6z"
+-    android:fillColor="#FFFFFFFF"/>
+-</vector>
+\ No newline at end of file
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
++  <path
++      android:pathData="M34,104 L48,60 L60,60 L74,104 Z"
++      android:fillColor="#FFFFFF"/>
++  <path
++      android:pathData="M52,96 L56,96 L57,88 L51,88 Z M51.5,84 L56.5,84 L57,76 L51,76 Z M52,72 L56,72 L56.5,66 L51.5,66 Z"
++      android:fillColor="#FFFFFF"/>
++  <path
++      android:pathData="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z"
++      android:fillColor="#FFFFFF"/>
++  <path
++      android:pathData="M44,39 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
++      android:fillColor="#FFFFFF"/>
++</vector>
+diff --git a/android/app/src/main/res/drawable/ic_logo_small.xml b/android/app/src/main/res/drawable/ic_logo_small.xml
+index 516758a..a7ea461 100644
+--- a/android/app/src/main/res/drawable/ic_logo_small.xml
++++ b/android/app/src/main/res/drawable/ic_logo_small.xml
+@@ -1,12 +1,18 @@
+ <vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="835dp"
+-    android:height="835dp"
+-    android:viewportWidth="835"
+-    android:viewportHeight="835">
++    android:width="108dp"
++    android:height="108dp"
++    android:viewportWidth="108"
++    android:viewportHeight="108">
+   <path
+-      android:pathData="M698.5,141.1a20,20 0,0 1,30.8 -1.3A416,416 0,0 1,835 417.4a416,416 0,0 1,-93.3 263,20 20,0 0,1 -31.3,-0.6l-43,-56.6a20,20 0,0 1,-0.2 -24,307 307,0 0,0 59.3,-181.8c0,-74.2 -26.2,-142.3 -69.9,-195.6a20,20 0,0 1,-0.5 -24.8zM260.7,456.4a20,20 0,0 1,-7.7 -36.7l282,-177.4a20,20 0,0 1,29.9 22.7l-97,318.9a20,20 0,0 1,-37.5 2.2l-49.2,-111.5z"
+-      android:fillColor="#fff"/>
++      android:pathData="M34,104 L48,60 L60,60 L74,104 Z"
++      android:fillColor="#FFFFFF"/>
+   <path
+-      android:pathData="M626.3,753a20,20 0,0 1,-6.2 29.6A416,416 0,0 1,417.5 835,417.7 417.7,0 0,1 0,417.4 417.7,417.7 0,0 1,603.3 43.5a20,20 0,0 1,7 30l-42.4,55.8a20,20 0,0 1,-24.2 6.1,307 307,0 0,0 -126.2,-27 309,309 0,0 0,-309 309c0,170.6 138.5,309 309,309a307,307 0,0 0,141.6 -34.3,20 20,0 0,1 25.1,5.6z"
+-      android:fillColor="#fff"/>
++      android:pathData="M52,96 L56,96 L57,88 L51,88 Z M51.5,84 L56.5,84 L57,76 L51,76 Z M52,72 L56,72 L56.5,66 L51.5,66 Z"
++      android:fillColor="#FFFFFF"/>
++  <path
++      android:pathData="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z"
++      android:fillColor="#FFFFFF"/>
++  <path
++      android:pathData="M44,39 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
++      android:fillColor="#FFFFFF"/>
+ </vector>
+diff --git a/android/app/src/main/res/layout-land/about.xml b/android/app/src/main/res/layout-land/about.xml
+index 9903aeb..092ee67 100644
+--- a/android/app/src/main/res/layout-land/about.xml
++++ b/android/app/src/main/res/layout-land/about.xml
+@@ -107,6 +107,14 @@
+             android:text="@string/about_proposition_3"
+             android:textAppearance="@style/MwmTextAppearance.Body1"
+             android:textColor="?android:textColorPrimary" />
++
++    <com.google.android.material.textview.MaterialTextView
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_marginBottom="@dimen/margin_half"
++        android:text="@string/about_waymark_attribution"
++        android:textAppearance="@style/MwmTextAppearance.Body2"
++        android:textColor="?android:textColorPrimary" />
+           </LinearLayout>
+         </LinearLayout>
+       </androidx.constraintlayout.widget.ConstraintLayout>
+diff --git a/android/app/src/main/res/layout/about.xml b/android/app/src/main/res/layout/about.xml
+index 3c9c8ee..baf1965 100644
+--- a/android/app/src/main/res/layout/about.xml
++++ b/android/app/src/main/res/layout/about.xml
+@@ -69,6 +69,14 @@
+         android:textAppearance="@style/MwmTextAppearance.Body1"
+         android:textColor="?android:textColorPrimary" />
+ 
++    <com.google.android.material.textview.MaterialTextView
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_marginBottom="@dimen/margin_half"
++        android:text="@string/about_waymark_attribution"
++        android:textAppearance="@style/MwmTextAppearance.Body2"
++        android:textColor="?android:textColorPrimary" />
++
+     <com.google.android.material.textview.MaterialTextView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+diff --git a/android/app/src/main/res/values/colors.xml b/android/app/src/main/res/values/colors.xml
+index b506d71..d1bcd9c 100644
+--- a/android/app/src/main/res/values/colors.xml
++++ b/android/app/src/main/res/values/colors.xml
+@@ -76,8 +76,8 @@
+   <color name="bg_statusbar_translucent">#66000000</color>
+ 
+   <!-- App icons background and foreground colors -->
+-  <color name="bg_app_icon_release">#588157</color>
+-  <color name="bg_app_icon_test">#588157</color>
++  <color name="bg_app_icon_release">#16263F</color>
++  <color name="bg_app_icon_test">#16263F</color>
+   <color name="bg_app_icon_debug">#f8b42e</color>
+ 
+   <color name="fg_app_icon_white">#fefdf6</color>
+diff --git a/android/app/src/main/res/values/donottranslate.xml b/android/app/src/main/res/values/donottranslate.xml
+index 2b41044..d231f68 100644
+--- a/android/app/src/main/res/values/donottranslate.xml
++++ b/android/app/src/main/res/values/donottranslate.xml
+@@ -12,7 +12,7 @@
+   <string name="pref_play_services" translatable="false">PlayServicesEnabled</string>
+   <string name="pref_enable_logging" translatable="false">EnableLogging</string>
+   <string name="pref_emulate_bad_external_storage" translatable="false">EmulateBadExternalStorage</string>
+-  <string name="pref_about" translatable="false">AboutCoMaps</string>
++  <string name="pref_about" translatable="false">AboutWaymark</string>
+   <string name="pref_map_style" translatable="false">MapStyle</string>
+   <string name="pref_tts_screen" translatable="false">TtsScreen</string>
+   <string name="pref_tts_enabled" translatable="false">TtsEnabled</string>
+@@ -57,7 +57,7 @@
+   <string name="notification_ticker_rtl" translatable="false">%2$s :%1$s</string>
+ 
+   <!-- "Report a problem" predefined texts -->
+-  <string name="problem_does_not_exist" translatable="false">The amenity has gone or never existed. This is an auto-generated note from CoMaps application: a user reports a POI that is visible on a map (which can be a month old), but cannot be found on the ground.</string>
++  <string name="problem_does_not_exist" translatable="false">The amenity has gone or never existed. This is an auto-generated note from Waymark application: a user reports a POI that is visible on a map (which can be a month old), but cannot be found on the ground.</string>
+ 
+   <!-- Tags -->
+   <string name="tag_menu_collapse" translatable="false">collapse</string>
+diff --git a/android/app/src/main/res/values/strings.xml b/android/app/src/main/res/values/strings.xml
+index 14ca17e..a628a0f 100644
+--- a/android/app/src/main/res/values/strings.xml
++++ b/android/app/src/main/res/values/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+     <!-- Project only name, app_name is added to strings in build.gradle & can contain "Debug" etc. prefixes. -->
+-    <string name="project_name" translatable="false">CoMaps</string>
++    <string name="project_name" translatable="false">Waymark</string>
+     <string name="app_site_url">https://comaps.app/</string>
+     <!-- SECTION: Strings -->
+     <!-- Button text (should be short) -->
+@@ -37,7 +37,7 @@
+     <string name="country_status_download_failed">Download has failed</string>
+     <!-- Button text for the button under the country_status_download_failed message -->
+     <string name="try_again">Try Again</string>
+-    <string name="about_menu_title">About CoMaps</string>
++    <string name="about_menu_title">About Waymark</string>
+     <!-- Text in About screen -->
+     <string name="about_headline">Open project powered by the community</string>
+     <!-- Text in About screen -->
+@@ -45,6 +45,7 @@
+     <!-- Text in About screen -->
+     <string name="about_proposition_2">• Privacy-focused and ads-free</string>
+     <!-- Text in About screen -->
++    <string name="about_waymark_attribution">Waymark is based on CoMaps and OpenStreetMap data.</string>
+     <string name="about_proposition_3">• Offline, fast and compact</string>
+     <!-- Text in About screen -->
+     <string name="about_developed_by_enthusiasts">Fully open source, not for profit, transparent decision-making and finances.</string>
+@@ -54,7 +55,7 @@
+     <string name="unsupported_phone">The app requires hardware accelerated OpenGL. Unfortunately, your device is not supported.</string>
+     <string name="download">Download</string>
+     <!-- Used in DownloadResources startup screen -->
+-    <string name="disconnect_usb_cable">Please disconnect USB cable or insert memory card to use CoMaps</string>
++    <string name="disconnect_usb_cable">Please disconnect USB cable or insert memory card to use Waymark</string>
+     <!-- Used in DownloadResources startup screen -->
+     <string name="not_enough_free_space_on_sdcard">Please free up some space on the SD card/USB storage first in order to use the app</string>
+     <string name="download_resources">Before you start using the app, please download the world overview map to your device.
+@@ -156,12 +157,12 @@
+     <!-- Notes field in Favorites view -->
+     <string name="description">Notes</string>
+     <!-- Email Subject when sharing Favorite list -->
+-    <string name="share_bookmarks_email_subject">My CoMaps Favorites</string>
++    <string name="share_bookmarks_email_subject">My Waymark Favorites</string>
+     <string name="share_bookmarks_email_body">Hello!
+ \n
+-\nAttached are my Favorites; please open them in CoMaps. If you don\'t have it installed you can download it here: https://www.comaps.app/download/
++\nAttached are my Favorites; please open them in Waymark. If you don\'t have it installed you can download it here: https://www.comaps.app/download/
+ \n
+-\nEnjoy travelling with CoMaps!</string>
++\nEnjoy travelling with Waymark!</string>
+     <!-- message title of loading file -->
+     <string name="load_kmz_title">Loading Favorites</string>
+     <!-- Kmz file successful loading -->
+@@ -171,7 +172,7 @@
+     <!-- Failed to recognize the format of a Favorites or tracks file. -->
+     <string name="unknown_file_type">The file type is not recognized by the app:
+ \n%1$s</string>
+-    <!-- Failed to open a Favorites file in CoMaps. -->
++    <!-- Failed to open a Favorites file in Waymark. -->
+     <string name="failed_to_open_file">Failed to open file %1$s
+ \n
+ \n%2$s</string>
+@@ -184,11 +185,11 @@
+     <!-- Alert message that downloading is in progress. -->
+     <string name="downloading_is_active">Map download is in progress now</string>
+     <!-- Share my position using SMS, %1$@ contains om:// and %2$@ https://comaps.app link WITHOUT NAME. @NOTE non-ascii symbols in the link will result in max 70 characters SMS instead of 140. -->
+-    <string name="my_position_share_sms">Check out my current location in CoMaps! %1$s or %2$s Don\'t have offline maps? Download here: https://www.comaps.app/download/</string>
++    <string name="my_position_share_sms">Check out my current location in Waymark! %1$s or %2$s Don\'t have offline maps? Download here: https://www.comaps.app/download/</string>
+     <!-- Share a position using EMail, %1$@ is https://comaps.at link WITH NAME and %2$@ is the geo url containing only coordinates.  -->
+     <string name="bookmark_share_email_subject">Follow this link %1$s or paste these coordinates %2$s into your maps app to see this location.</string>
+     <!-- Subject for emailed position -->
+-    <string name="my_position_share_email_subject">Hey, check out my current location on the CoMaps map!</string>
++    <string name="my_position_share_email_subject">Hey, check out my current location on the Waymark map!</string>
+     <!-- Share my position using EMail, %1$@ is https://comaps.at link WITHOUT NAME and %2$@ is the geo url  -->
+     <string name="my_position_share_email">Follow this link %1$s or paste these coordinates %2$s into your maps app to see my location.</string>
+     <!-- Share button text which opens menu with more buttons, like Message, EMail, Facebook etc. -->
+@@ -201,7 +202,7 @@
+     <string name="done">Done</string>
+     <!-- Data version in «About» screen, %@ is replaced by a local, human readable date. -->
+     <string name="data_version">OpenStreetMap data: %s</string>
+-    <!-- Summary of the "About CoMaps" settings row -->
++    <!-- Summary of the "About Waymark" settings row -->
+     <string name="pref_about_summary">Report issues, get help, donate\nVersion: v%1$s</string>
+     <!-- Title for tracks category in Favorites manager -->
+     <string name="tracks_title">Tracks</string>
+@@ -223,7 +224,7 @@
+     <string name="prefs_group_advanced">Advanced</string>
+     <string name="prefs_group_advanced_summary">Enable logging</string>
+     <string name="download_resources_custom_url_title">Custom Map Server</string>
+-    <string name="download_resources_custom_url_message">Override the default map download server used for map downloads. Leave empty to use CoMaps default server.</string>
++    <string name="download_resources_custom_url_message">Override the default map download server used for map downloads. Leave empty to use the default server (CoMaps).</string>
+     <string name="download_resources_custom_url_summary_none">Not set</string>
+     <string name="download_resources_custom_url_error_scheme">Please enter a URL starting with http:// or https://</string>
+     <!-- Settings «Map» category: «Night style» title -->
+@@ -265,7 +266,7 @@
+     <string name="menu">Menu</string>
+     <!-- Text in menu -->
+     <string name="website">Website</string>
+-    <!-- Text in About menu, opens CoMaps news website -->
++    <!-- Text in About menu, opens Waymark news website -->
+     <string name="news">News</string>
+     <!-- Text on the place page -->
+     <string name="panoramax">Panoramax Picture</string>
+@@ -280,7 +281,7 @@
+     <!-- Button in the main menu -->
+     <string name="donate">Donate</string>
+     <!-- Button in the main Help dialog -->
+-    <string name="how_to_support_us">Volunteer and improve CoMaps</string>
++    <string name="how_to_support_us">Volunteer and improve Waymark</string>
+     <!-- Button in the main Help dialog -->
+     <string name="copyright">Copyright</string>
+     <!-- Text in menu + Button in the main Help dialog -->
+@@ -527,7 +528,7 @@
+     <!-- Text in About and OSM Login screens. First %@ is replaced by a local, human readable date. -->
+     <string name="osm_presentation">Community-created OpenStreetMap data as of %s. Learn more about how to edit and update the map at OpenStreetMap.org</string>
+     <!-- OSM explanation on Android login screen -->
+-    <string name="login_osm_presentation">OpenStreetMap.org (OSM) is a community project to build a free and open map. It\'s the main source of map data in CoMaps and works similar to Wikipedia. You can add or edit places and they become available to millions of users all over the World.
++    <string name="login_osm_presentation">OpenStreetMap.org (OSM) is a community project to build a free and open map. It\'s the main source of map data in Waymark and works similar to Wikipedia. You can add or edit places and they become available to millions of users all over the World.
+ \nJoin the community and help to make a better map for everyone!</string>
+     <string name="login_to_make_edits_visible">Create an OpenStreetMap account or log in to publish your map edits to the world</string>
+     <!-- Downloaded 10 **of** 20 <- it is that "of" -->
+@@ -543,7 +544,7 @@
+     <!-- Title for OSM note section in the editor -->
+     <string name="editor_other_info">Note to OpenStreetMap volunteers (optional)</string>
+     <!-- Hint of the input field in the OSM note section of the editor -->
+-    <string name="editor_note_hint">Describe errors on the map or things that cannot be edited with CoMaps</string>
++    <string name="editor_note_hint">Describe errors on the map or things that cannot be edited with Waymark</string>
+     <!-- Information about OSM at the top of the editing page -->
+     <string name="editor_about_osm">Your edits are uploaded to the public <a href="https://wiki.openstreetmap.org/wiki/About_OpenStreetMap">OpenStreetMap</a> database. Please do not add personal or copyrighted information.</string>
+     <string name="editor_more_about_osm">More about OpenStreetMap</string>
+@@ -553,7 +554,7 @@
+     <!-- To indicate the operator of ATMs, bicycle rentals, electric vehicle charging stations... -->
+     <string name="operator">Operator: %s</string>
+     <string name="editor_category_unsuitable_title">Can\'t find a suitable category?</string>
+-    <string name="editor_category_unsuitable_text">CoMaps is only able to add simple point categories, it isn\'t able to add towns, roads, lakes, building outlines, etc. Please add such categories directly to <a href="https://www.openstreetmap.org">OpenStreetMap.org</a>. Check our <a href="https://www.comaps.app/support/advanced-map-editing/">guide</a> for detailed step by step instructions.</string>
++    <string name="editor_category_unsuitable_text">Waymark is only able to add simple point categories, it isn\'t able to add towns, roads, lakes, building outlines, etc. Please add such categories directly to <a href="https://www.openstreetmap.org">OpenStreetMap.org</a>. Check our <a href="https://www.comaps.app/support/advanced-map-editing/">guide</a> for detailed step by step instructions.</string>
+     <string name="downloader_no_downloaded_maps_title">You haven\'t downloaded any maps</string>
+     <string name="downloader_no_downloaded_maps_message">Download maps to search and navigate offline</string>
+     <string name="current_location_unknown_error_title">Current location is unknown</string>
+@@ -601,7 +602,7 @@
+     <!-- Description of info shown when the map is older than 3 months -->
+     <string name="place_page_map_too_old_description"> Your current map data is very old, please update the map.</string>
+     <!-- Description of info shown when the app and the map are older than 6 months -->
+-    <string name="place_page_app_too_old_description"> Your current map data is very old, please update the CoMaps app.</string>
++    <string name="place_page_app_too_old_description"> Your current map data is very old, please update the Waymark app.</string>
+     <!-- Button to update map region, part of the map too old info -->
+     <string name="place_page_update_too_old_map">Update map region</string>
+     <!-- Toast shown after pressing add place / edit OpenStreetMap when editing is disabled -->
+@@ -633,7 +634,7 @@
+     <string name="pref_font_size">Font size for map labels</string>
+     <string name="increase_font_size">Increase map label size</string>
+     <string name="decrease_font_size">Decrease map label size</string>
+-    <string name="traffic_update_app">Please update CoMaps</string>
++    <string name="traffic_update_app">Please update Waymark</string>
+     <!-- "traffic" as in "road congestion" -->
+     <string name="traffic_data_unavailable">Traffic data is not available</string>
+     <string name="enable_logging">Enable logging</string>
+@@ -850,7 +851,7 @@
+     <string name="instagram_url">https://www.instagram.com/comaps.app/</string>
+     <!-- A link to the TTS FAQ -->
+     <string name="tts_info_link">https://www.comaps.app/support/tts-configuration-guide-for-android/</string>
+-    <!-- Translated CoMaps site, add new translations here: https://translate.codeberg.org/projects/comaps/website -->
++    <!-- Translated Waymark site, add new translations here: https://translate.codeberg.org/projects/comaps/website -->
+     <string name="translated_om_site_url">https://comaps.app/</string>
+     <!-- Link to OSM wiki for Editor, Profile and About pages -->
+     <string name="osm_wiki_about_url">https://wiki.openstreetmap.org/wiki/About_OpenStreetMap</string>
+@@ -877,9 +878,9 @@
+     <!-- App tip #09 -->
+     <string name="app_tip_09">Our main goal is to build fast, privacy-focused, easy-to-use maps that you will love.</string>
+     <!-- Text on the Android Auto or CarPlay placeholder screen that maps are displayed on the phone screen -->
+-    <string name="car_used_on_the_phone_screen">You are now using CoMaps on the phone screen</string>
++    <string name="car_used_on_the_phone_screen">You are now using Waymark on the phone screen</string>
+     <!-- Text on the phone placeholder screen that maps are displayed on the car screen -->
+-    <string name="car_used_on_the_car_screen">You are now using CoMaps on the car screen</string>
++    <string name="car_used_on_the_car_screen">You are now using Waymark on the car screen</string>
+     <!-- Displayed on the phone screen. Android Auto connected -->
+     <string name="aa_connected_title">You are connected to Android Auto</string>
+     <!-- Displayed on the phone screen. Button to display maps on the phone screen instead of a car -->
+@@ -887,11 +888,11 @@
+     <!-- Displayed on the Android Auto or CarPlay screen. Button to display maps on the car screen instead of a phone. Must be no more than 18 symbols! -->
+     <string name="car_continue_in_the_car">To the car screen</string>
+     <!-- Ask user to grant location permissions -->
+-    <string name="aa_location_permissions_request">CoMaps needs location access. When it\'s safe, check the notification on your phone.</string>
++    <string name="aa_location_permissions_request">Waymark needs location access. When it\'s safe, check the notification on your phone.</string>
+     <!-- Notification title for permission request from AA. -->
+     <string name="aa_request_permission_notification">This app needs your permission</string>
+     <!-- The text in the activity for location permission request. -->
+-    <string name="aa_request_permission_activity_text">CoMaps in Android Auto needs location permissions to work effectively</string>
++    <string name="aa_request_permission_activity_text">Waymark in Android Auto needs location permissions to work effectively</string>
+     <!-- Grant Permissions button. -->
+     <string name="aa_grant_permissions">Grant Permissions</string>
+     <!-- Outdoors/hiking map style (activity) name in the Styles and Layers dialog -->
+@@ -1035,7 +1036,7 @@
+     <!-- Should match TTS string with the same id, eg. data/sound-strings/en.json/localize.json -->
+     <string name="route_recalculating">Recalculating the route…</string>
+     <string name="pref_openexternallinks_title">Automatically open third-party links</string>
+-    <string name="pref_openexternallinks_summary">Open third-party links in CoMaps by default</string>
++    <string name="pref_openexternallinks_summary">Open third-party links in Waymark by default</string>
+     <string name="pref_aa_support_title">Android Auto</string>
+     <string name="pref_aa_support_summary_yes">The app has been installed from Google Play, you can use it in your car.</string>
+     <string name="pref_aa_support_summary_no">The app has not been installed from Google Play, you can\'t use it in your car. Press the setting to get more details on our FAQ.</string>
+@@ -1054,7 +1055,7 @@
+     <string name="capacity_charging_yes">Has spaces with chargers</string>
+     <string name="capacity_charging_no">No spaces with chargers</string>
+     <!-- Permission descriptions -->
+-    <string name="permission_read_navigation_label">Read CoMaps navigation data</string>
++    <string name="permission_read_navigation_label">Read Waymark navigation data</string>
+     <string name="permission_read_navigation_description">read live navigation information such as upcoming turns or the name of the road you are on</string>
+     <!-- Reviews -->
+     <string name="place_reviews_title">Place Reviews</string>
+diff --git a/android/sdk/src/main/cpp/app/organicmaps/sdk/editor/Editor.cpp b/android/sdk/src/main/cpp/app/organicmaps/sdk/editor/Editor.cpp
+index dd53419..ad3ad2d 100644
+--- a/android/sdk/src/main/cpp/app/organicmaps/sdk/editor/Editor.cpp
++++ b/android/sdk/src/main/cpp/app/organicmaps/sdk/editor/Editor.cpp
+@@ -370,7 +370,7 @@ JNIEXPORT void JNICALL Java_app_organicmaps_sdk_editor_Editor_nativeUploadChange
+ {
+   // TODO: Handle upload status in callback
+   Editor::Instance().UploadChanges(jni::ToNativeString(env, token),
+-                                   {{"created_by", "CoMaps " OMIM_OS_NAME " " + jni::ToNativeString(env, appVersion)},
++                                   {{"created_by", "Waymark " OMIM_OS_NAME " " + jni::ToNativeString(env, appVersion)},
+                                     {"bundle_id", jni::ToNativeString(env, appId)}},
+                                    nullptr);
+ }
+diff --git a/android/settings.gradle.kts b/android/settings.gradle.kts
+index ea52ba0..a069e69 100644
+--- a/android/settings.gradle.kts
++++ b/android/settings.gradle.kts
+@@ -16,6 +16,6 @@ dependencyResolutionManagement {
+         maven { url = URI("https://www.jitpack.io") } // MPAndroidChart
+     }
+ }
+-rootProject.name = "CoMaps"
++rootProject.name = "Waymark"
+ include(":app")
+ include(":sdk")
+diff --git a/waymark-icon.svg b/waymark-icon.svg
+new file mode 100644
+index 0000000..9bb1f09
+--- /dev/null
++++ b/waymark-icon.svg
+@@ -0,0 +1,11 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="432" height="432" role="img" aria-label="Waymark icon">
++  <title>Waymark icon (original)</title>
++  <desc>Dark navy square with a warm amber map pin above a white road. Original mark created for the Waymark fork of CoMaps. Android uses this geometry as vector drawables plus generated PNG densities; the navy background is the adaptive-icon background colour (#16263F).</desc>
++  <rect width="108" height="108" fill="#16263F"/>
++  <polygon points="34,104 48,60 60,60 74,104" fill="#FFFFFF"/>
++  <polygon points="52,96 56,96 57,88 51,88" fill="#16263F"/>
++  <polygon points="51.5,84 56.5,84 57,76 51,76" fill="#16263F"/>
++  <polygon points="52,72 56,72 56.5,66 51.5,66" fill="#16263F"/>
++  <path d="M54,14 C39,14 28,25 28,39 C28,55 54,80 54,80 C54,80 80,55 80,39 C80,25 69,14 54,14 Z" fill="#F8B42E"/>
++  <circle cx="54" cy="39" r="10" fill="#16263F"/>
++</svg>
