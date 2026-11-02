@@ -1,0 +1,116 @@
+# Waymark slim cloud build: build the Waymark APK on a GitHub Actions
+# runner without pushing the whole CoMaps fork.
+#
+# Slim design: this repository holds ONLY the Waymark patch, the launcher
+# icons (as base64 text), and this workflow. The run fetches the full
+# CoMaps source from Codeberg at the pinned commit below, applies the
+# patch, restores the icons, and builds. This exists because the GitHub
+# snapshot push is capped at 2,000 files / 16 MiB of UTF-8 with no
+# binaries, and the full fork is 13,027 paths / 440 MB with 1,511
+# non-UTF-8 files, so the full fork cannot be pushed that way.
+#
+# Pinned upstream: CoMaps commit 27ea5a9b92b266abe6d1b690e02ad5c89bf95217
+# ("[docs] Improve map styles documentation", 2026-10-28). The patch is
+# the diff from that commit to Waymark HEAD d80d2b2, restricted to the
+# 18 text code/resource paths. It excludes FORK_NOTES.md, CLOUD_BUILD.md
+# and the full-fork workflow (docs, not needed to build) and the 5
+# launcher icon PNGs, which arrive as base64 in binaries/ instead,
+# because a snapshot push cannot carry binaries.
+#
+# The patch is the Waymark rebrand: app name Waymark, app ID app.waymark,
+# strings, colours, icons, about screens, OSM created_by "Waymark".
+# Licences and OpenStreetMap/CoMaps attribution are preserved; no
+# tracking, analytics or ads are added.
+#
+# Known first-failure point, copied from the full-fork workflow: no
+# setup-java / setup-android step is added. Like android-check.yaml, this
+# relies on the ubuntu-latest runner's preinstalled Temurin 21 JDK and
+# Android SDK (JAVA_HOME below). If that preinstalled path has moved on
+# current runners, that will be the first visible failure in the log.
+# Debug only, no secrets, no release signing, no ccache.
+name: Waymark Slim Build
+on:
+  workflow_dispatch: # Manual trigger only. No push/PR triggers.
+
+env:
+  JAVA_HOME: /usr/lib/jvm/temurin-21-jdk-amd64  # Java 21 is required for Android Gradle 8 plugin
+  SKIP_MAP_DOWNLOAD: true
+
+jobs:
+  waymark-slim-fdroid-debug:
+    name: Build Waymark F-Droid debug (arm64) from patch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install build tools and dependencies
+        shell: bash
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build \
+          qt6-base-dev \
+          qt6-declarative-dev \
+          qt6-positioning-dev \
+          libqt6svg6-dev \
+          optipng \
+          libfreetype-dev \
+          libharfbuzz-dev \
+          libxrandr-dev \
+          libxinerama-dev \
+          libxcursor-dev \
+          libxi-dev \
+          python3-pip \
+          zlib1g-dev
+          pip install "protobuf<3.21" --break-system-packages
+
+      - name: Checkout slim repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Fetch CoMaps source at pinned commit
+        shell: bash
+        run: |
+          mkdir -p source
+          git init source
+          git -C source fetch --depth 1 https://codeberg.org/comaps/comaps.git 27ea5a9b92b266abe6d1b690e02ad5c89bf95217
+          git -C source checkout FETCH_HEAD
+
+      - name: Parallel submodules checkout
+        shell: bash
+        run: git -C source submodule update --depth 1 --init --recursive --jobs=$(($(nproc) * 20))
+
+      - name: Check and apply Waymark patch
+        shell: bash
+        run: |
+          cp waymark.patch source/waymark.patch
+          git -C source apply --check --whitespace=fix waymark.patch
+          git -C source apply --whitespace=fix waymark.patch
+
+      - name: Restore launcher icons and verify hashes
+        shell: bash
+        run: |
+          while read -r target b64file sha size; do
+            case "$target" in \#*|"") continue;; esac
+            mkdir -p "source/$(dirname "$target")"
+            base64 -d "$b64file" > "source/$target"
+            echo "$sha  source/$target" | sha256sum -c -
+          done < binaries/MANIFEST.txt
+
+      - name: Configure repository
+        shell: bash
+        working-directory: source
+        run: ./configure.sh
+
+      - name: Compile Waymark F-Droid debug (arm64)
+        shell: bash
+        working-directory: source/android
+        run: |
+          cmake --version
+          ninja --version
+          ./gradlew -Parm64 assembleFdroidDebug
+
+      - name: Upload Waymark apk
+        uses: actions/upload-artifact@v6
+        with:
+          name: waymark-apk
+          path: source/android/app/build/outputs/apk/**/Waymark-*.apk
+          if-no-files-found: error
